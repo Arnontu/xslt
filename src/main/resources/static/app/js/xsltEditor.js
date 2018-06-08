@@ -185,18 +185,30 @@ $('#showInput').click(function() {
 	$('[inputColumn]').removeAttr('hidden');
 	$('[outputColumn]').attr('hidden', true);
 	$('[fragmentsColumn]').attr('hidden', true);
+	
+	$('#showInput').removeClass("btn-warning").addClass("btn-outline-warning");
+	$('#showOutput').removeClass("btn-outline-warning").addClass("btn-warning");
+	$('#showFragments').removeClass("btn-outline-warning").addClass("btn-warning");
 });
 
 $('#showOutput').click(function() {
 	$('[inputColumn]').attr('hidden', true);
 	$('[outputColumn]').removeAttr('hidden');
 	$('[fragmentsColumn]').attr('hidden', true);
+
+	$('#showInput').removeClass("btn-outline-warning").addClass("btn-warning");
+	$('#showOutput').removeClass("btn-warning").addClass("btn-outline-warning")
+	$('#showFragments').removeClass("btn-outline-warning").addClass("btn-warning");
 });
 
 $('#showFragments').click(function() {
 	$('[inputColumn]').attr('hidden', true);
 	$('[outputColumn]').attr('hidden', true);
 	$('[fragmentsColumn]').removeAttr('hidden');
+
+	$('#showInput').removeClass("btn-outline-warning").addClass("btn-warning");
+	$('#showOutput').removeClass("btn-outline-warning").addClass("btn-warning");
+	$('#showFragments').removeClass("btn-warning").addClass("btn-outline-warning");
 });
 
 
