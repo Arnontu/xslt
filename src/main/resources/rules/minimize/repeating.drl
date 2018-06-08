@@ -1,0 +1,61 @@
+
+
+package rules.minimize;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
+
+dialect  "mvel"
+
+declare Remove
+	node : Node
+end
+
+declare AppendForeach
+	parent : Node
+	tag: String
+	selector : String
+end
+
+
+rule "print repeating elements"
+when
+   e1 : Element( nodeType == 1)
+   e2 : Element( e1 != e2 && nodeType == 1 && parentNode == e1.parentNode && nodeName == e1.nodeName )
+   not ( exists AppendForeach( parent == e1.parentNode && tag == e1.nodeName ) )
+then
+   System.out.println("repeating: " + e1.parentNode.nodeName + "/" + e1.nodeName)  ;
+   Remove r = new Remove();
+   r.setNode(e1);
+   insert(r);
+   
+   AppendForeach afe = new AppendForeach();
+   afe.setParent(e1.getParentNode());
+   afe.setTag(e1.getNodeName());
+   afe.setSelector("changeMe");
+   insert (afe);
+end
+
+
+rule "remove element"
+when 
+	r : Remove()
+then
+	Node e = r.getNode();
+	System.out.println("removing: " + e.getNodeName());
+	Node p = e.getParentNode();
+	if (p != null) {
+		p.removeChild(e);
+		delete(e);
+	}
+	delete(r)
+end
+
+rule "append xsl:for-each"
+when
+	fe : AppendForeach();
+then
+	System.out.println("append for-each: " + fe.getTag());
+end
+ 
+	

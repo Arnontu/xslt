@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<books>
+   <book>
+      <title>Pride and Prejudice</title>
+      <author>Jane Austen</author>
+      <category>Mass-market Paperback</category>
+      <run>1</run>
+   </book>
+   <book>
+      <title>Wuthering Heights</title>
+      <author>Charlotte Brontë</author>
+      <category>Paperback</category>
+      <run>1</run>
+   </book>
+   <book>
+      <title>Tess of the d'Urbervilles</title>
+      <author>Thomas Hardy</author>
+      <category>Paperback</category>
+      <run>1</run>
+   </book>
+   <book>
+      <title>Jude the Obscure</title>
+      <author>Thomas Hardy</author>
+      <category>Paperback</category>
+      <run>1</run>
+   </book>
+   <book>
+      <title>The Big Over Easy</title>
+      <author>Jasper Fforde</author>
+      <category>Hard Cover</category>
+      <run>1</run>
+   </book>
+   <book>
+      <title>The Eyre Affair</title>
+      <author>Jasper Fforde</author>
+      <category>Paperback</category>
+      <run>1</run>
+   </book>
+</books>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <title>Hello, world!</title>
+  </head>
+  <body>
+    <h1><span th:text="'Hello, ' + ${name} + '!'" ></span></h1>
+    <div class="container"> 
+		<p>Asterisk icon: <span class="glyphicon glyphicon-asterisk"></span></p>  
+		<i class="fa fa-align-center"></i>
+	</div>
+	
+		<div class="d-flex flex-column">
+		  	<div class="p-2">Flex item 2</div>
+			<div id="jstree_demo"></div>
+		  	<div class="p-2">Flex item 3</div>
+		</div>
+		
+	<!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+  
+  	<script>
+  	$('#jstree_demo').jstree({
+  	  "core" : {
+  	    "animation" : 0,
+  	    "check_callback" : true,
+  	    "themes" : { "stripes" : true },
+  	    'data' : [{"id":1,"text":"Root node", "type":"root","children":[{"id":2,"text":"Child node 1"},{"id":3,"text":"Child node 2"}]}]
+  	  },
+  	  "types" : {
+  	    "#" : {
+  	      "max_children" : 1,
+  	      "max_depth" : 4,
+  	      "valid_children" : ["root"]
+  	    },
+  	    "root" : {
+  	      "icon" : "fa fa-align-justify",
+  	      "valid_children" : ["default"]
+  	    },
+  	    "default" : {
+  	    	"icon" : "fa fa-align-center",
+  	      "valid_children" : ["default","file"]
+  	    },
+  	    "file" : {
+  	      "icon" : "fa fa-align-center",
+  	      "valid_children" : []
+  	    }
+  	  },
+  	  "plugins" : [
+  	    "contextmenu", "dnd", "search",
+  	    "state", "types", "wholerow"
+  	  ]
+  	});
+  	</script>
+  
+  
+  </body>
+</html>
+

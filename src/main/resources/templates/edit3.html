@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link href="/iconic/css/open-iconic-bootstrap.css" rel="stylesheet">    
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css" integrity="sha256-BJ/G+e+y7bQdrYkS2RBTyNfBHpA9IuGaPmf9htub5MQ=" crossorigin="anonymous" />
+	<link href="/app/css/edit.css" rel="stylesheet">
+    <title>XSLT Editor</title>
+  </head>
+
+
+<body >
+
+	<nav class="navbar navbar-dark bg-dark " style="padding-top:0;">
+		<span class="navbar-brand h1" href="#">B2B Gateway</span>
+		<span class="navbar-text h3">XSLT Editor</span>
+	</nav>
+	
+	<div id="editorMain" class="container-fluid">
+
+		<!--  ======================================== -->	
+		<!--  Actions row: save, test, ...                                 -->
+		<!--  ======================================== -->	
+		<div class="row">
+			<div class="col" inputColumn >
+		        <form class="form-inline my-2 my-lg-0">
+		          <input id="xmlFileName" class="form-control w-75 text-file" type="text" th:value="${xmlFileName}" readonly>
+	  				<input id="xml-search" class="form-control w-25 " type="text" placeholder="search">
+		        </form>
+			</div>
+            <div class="col" outputColumn hidden >
+                <form class="form-inline my-2 my-lg-0">
+                  <input id="outFileName" class="form-control w-75 text-file" type="text" th:value="${outFileName}" readonly>
+                  <input id="output-search" class="form-control w-25" type="text" placeholder="search">
+                </form>
+            </div>
+            <div class="col" fragmentsColumn hidden>
+                <form class="form-inline my-2 my-lg-0">
+                  <input id="fragments" class="form-control w-100 text-file" type="text" th:value="Fragments" readonly>
+                </form>
+            </div>
+			<div class="col">
+		        <form class="form-inline my-2 my-lg-0">
+		          <input id="xslFileName" class="form-control w-75 text-file" type="text" th:value="${xslFileName}" readonly>
+    			  <input id="xslt-search" class="form-control w-25" type="text" placeholder="search">
+		        </form>
+			</div>
+
+		</div>
+
+		<!--  ======================================== -->	
+		<!--  Tree edit actions                                 -->
+		<!--  ======================================== -->	
+		<div class="row mb-2" >
+			<div class="col">
+				<div class="float-left mr-3">
+                    <button id="showInput" class="btn btn-outline-warning ml-1" type="button" title="Show sample input">In</button>
+                    <button id="showOutput" class="btn btn-warning ml-1" type="button" title="Show output" >Out</button>
+                    <button id="showFragments" class="btn btn-warning ml-1" type="button" title="Show availavle fragments" >Frg</button>
+                </div>
+                <div class="float-right mr-3">
+ 					<button id="copyInputPath" class="btn btn-xslt ml-1" type="button" title="Copy selected input element as XQuery path"><i class="fa fa-arrows-h"></i></button>
+					<button id="copyInputElement" class="btn btn-xslt"  type="button" title="Copy selected input element to template (auto-map)"><i class="fa fa-sitemap"></i></button>
+					<button id="copyFragment" class="btn btn-xslt ml-1" type="button" title="Clone selected XSLT fragment to template"><i class="fa fa-clone"></i></button>
+				</div>
+			</div>
+			<div class="col">
+ 		        <button id="xslRun" class="btn btn-xslt ml-1" type="button" title="Test"><i class="oi oi-media-skip-forward"></i></button>
+				<div class="float-right mr-3">
+					<button id="createTemplateNode" class="btn btn-xslt ml-1" type="button" title="create template node"><i class="fa fa-plus"></i></button>
+					<button id="deleteTemplateNode" class="btn btn-xslt ml-1" type="button" title="delete template node"><i class="fa fa-remove"></i></button>
+					<button id="copyTemplateNode" class="btn btn-xslt ml-1" type="button" title="copy node"><i class="fa fa-copy"></i></button>
+					<button id="pasteTemplateNode" class="btn btn-xslt ml-1" type="button" title="paste node"><i class="fa fa-paste"></i></button>
+					<button id="editTemplateNodeText" class="btn btn-xslt ml-1" type="button" title="edit template node's text/query" data-toggle="modal" data-target="#editTextModal"><i class="fa fa-edit"></i></button>
+				</div>
+			</div>
+		</div>
+
+		<!--  ======================================== -->	
+		<!-- Trees row                                 -->
+		<!--  ======================================== -->	
+		<div class="row">
+            <div class="col" inputColumn>
+                <div>
+                    <div id="jstree-xmldata" class="bg-light xmltree mt-1"></div>
+                </div>
+            </div>
+
+            <div class="col" fragmentsColumn hidden>
+                <div>
+                    <div id="jstree-fragments" class="bg-light xmltree mt-1"></div>
+                </div>
+            </div>
+
+            <div class="col" outputColumn hidden>
+                <div>
+                    <div id="jstree-outdata" class="bg-light xmltree mt-1"></div>
+                </div>
+            </div>
+
+			<div class="col">
+				<div>
+					<div id="jstree-xsltdata" class="bg-light xmltree mt-1"></div>
+				</div>
+			</div>
+		</div>
+
+		
+	</div>  <!-- editor main area -->
+
+	<nav class="navbar navbar-dark bg-dark mt-3">
+		<span class="navbar-brand h1" href="#">Informatica</span>
+	</nav>
+
+
+	<!-- modal dialog for template node text/query edit -- will be a query builder one day -->
+	<div id="editTextModal" class="modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h6 class="modal-title">XQuery Builder</h6>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+					  <textarea class="form-control" rows="10" cols="80" id="xqueryTextArea"></textarea>
+					</div>
+					<button id="closeQueryBuilder" type="button" class="btn btn-xslt ok" data-dismiss="modal" aria-label="OK">OK</span></button>
+<!-- 					<button id="cancelQueryBuilder" type="button" class="btn btn-xslt cancel" data-dismiss="modal" aria-label="Cancel">Cancel</span></button> -->
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 3rd party scripts -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+
+	<!-- setting trees data in global vars -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var xmlData = /*[[${xmlData}]]*/'default';
+		var xsltData = /*[[${xsltData}]]*/'default';
+		var outputData = /*[[${outputData}]]*/'default';
+		/*]]>*/
+	</script>
+
+	<!-- app scripts -->
+	<script src="/app/js/jstreeBinder.js"></script>
+	<script src="/app/js/xsltServices.js"></script>
+	<script src="/app/js/xsltEditor.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+
+
+package rules.map;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
+import org.w3c.dom.Document;
+import java.lang.System;
+
+dialect  "mvel"
+
+global Document $leftDoc;
+global Document	$rightDoc;
+
+declare EqualNodes
+	left : Node
+	right: Node
+	score : int
+end
+
+
+rule "compare element nodes"
+when
+   $left : Node( ownerDocument == $leftDoc, nodeType == 1, $lname : nodeName )
+   $right: Node( ownerDocument == $rightDoc, nodeType == 1, nodeName.equalsIgnoreCase($lname))
+   //eval ($lname != null && $rname != null && $lname.equalsIgnoreCase($rname))
+then
+	insertLogical ( new EqualNodes($left, $right, 100) )
+end
+
+
+rule "compare text nodes"
+when
+   eval (false)
+   $left : Node( ownerDocument == $leftDoc, nodeType == 3, $lval : nodeValue )
+   $right: Node( ownerDocument == $rightDoc, nodeType == 3, $rval : nodeValue)
+   eval ($lval != null && $rval != null && $lval.equalsIgnoreCase($rval))
+then
+	insertLogical ( new EqualNodes($left, $right, 100) )
+end
+
+
+rule "dummy rule to print pairs"
+when 
+	en: EqualNodes()
+then
+	System.out.println("equals: " + en.left + " " + en.right)  ;
+end

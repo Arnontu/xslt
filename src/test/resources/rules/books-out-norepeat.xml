@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<books>
+	<book>
+		<title>Pride and Prejudice</title>
+		<author>Jane Austen</author>
+		<category>Mass-market Paperback</category>
+		<run>1</run>
+		<PUB-DATE>2002-12-31</PUB-DATE>
+		<LANGUAGE>English</LANGUAGE>
+		<PRICE>9</PRICE>
+		<QUANTITY>187</QUANTITY>
+		<ISBN>0679601686</ISBN>
+		<PAGES>352</PAGES>
+		<DIMENSIONS UNIT="in">8.3 5.7 1.1</DIMENSIONS>
+		<WEIGHT UNIT="oz">6.1</WEIGHT>
+	</book>
+</books>

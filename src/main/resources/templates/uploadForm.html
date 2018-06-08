@@ -1,0 +1,119 @@
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:form="http://www.springframework.org/tags/form"
+	>
+	
+<head>
+<title>File Manger</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	
+	
+<script>
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop(ev) {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("text");
+    ev.target.value = data;
+}
+</script>
+	
+</head>
+
+<body style="padding: 3%;">
+
+	<div th:insert="headerTmpl :: nav">...</div>
+
+	<div th:if="${message}">
+		<h2 th:text="${message}"></h2>
+	</div>
+
+	<div>
+		<form method="POST" enctype="multipart/form-data" action="/" style="border:3px solid grey;">
+			<table>
+				<tr>
+					<td><input type="submit" value="Upload" /></td>
+					<td></td>
+					<td><input type="file" name="file" /></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+
+	<table class="table table-striped" style="border:3px solid grey;">
+		<thead>
+			<tr>
+				<th></th>
+				<th></th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="file : ${files}">
+				<td>
+					<div th:switch="${file.type}">
+					      <div th:case="'XML'">
+								<i class="glyphicon glyphicon-file"></i>
+					      </div>
+					      <div th:case="'XSLT'">
+								<i class="glyphicon glyphicon-text-width"></i>
+					      </div>
+					 </div>  
+				 </td>
+			
+				<td><div draggable="true" ondragstart="drag(event)" th:text="${file.localPath}" ></div></td>
+				<td><a th:href="${file.downloadUrl}" th:text="${file.downloadUrl}"></a></td>
+				<td><div th:text="${file.type}" ></div></td>
+			</tr>
+		</tbody>
+	</table>
+	
+	<div class="container-fluid" style="border:3px solid grey;">
+		<form method="POST" action="/edit"  >
+		  <div class="form-group">
+		    <label for="sampleInputFile">Sample Input</label>
+		    <input name="sampleInputFile" type="text" class="form-control" id="sampleInputFile" ondrop="drop(event)" ondragover="allowDrop(event)" placeholder="Drag XML file from table">
+		    <small id="emailHelp" class="form-text text-muted">Sample input XML document, to help building and testing the template.</small>
+		  </div>
+		  <div class="form-group">
+		    <label for="templateFile">Template</label>
+		    <input name="templateFile" type="text" class="form-control" id="templateFile" aria-describedby="emailHelp" placeholder="Drag template file from table">
+		  </div>
+		  <div class="form-group">
+		    <label for="sampleOutputFile">Sample output</label>
+		    <input name="sampleOutputFile" type="text" class="form-control" id="sampleOutputFile" placeholder="Drag XML file from table">
+		    <small id="outputHelp" class="form-text text-muted">Sample output XML document, to help building and testing the template.</small>
+		  </div>
+		  
+		  <div style="padding: 2%;">
+		    <label class="radio">
+   		    	<input type="radio" name="createMode" value="EDIT">Edit existing template  
+		    </label>
+		    <label class="radio">
+   		    	<input type="radio" name="createMode" value="EMPTY">Create new empty template 
+		    </label>
+		    <label class="radio">
+		    	<input type="radio" name="createMode" value="SAMPLE">Create new template from sample XML document
+		    </label>
+		  </div>
+		  
+		  <button type="submit" class="btn btn-primary">Edit Template</button>
+		</form>	
+	</div>
+	
+</body>
+</html>

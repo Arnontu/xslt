@@ -1,0 +1,227 @@
+
+dnd_stop.vakata.jstree
+(event, data)
+data.nodes[0] = source node ID
+get the source node:  h.data.origin.get_node(h.data.nodes[i])
+
+===========================
+
+
+EVENT copy_node (event, original)
+Original
+	instance >>> xslt tree isntance
+	node >>>  the new JSNODE that was created (but only with TEXT and TYPE. No BOUND)
+	parent >>> the parent node on the drop/target tree 
+
+=============================
+
+<button id="xslSave" class="btn btn-xslt ml-1" type="button" title="Save"><i class="oi oi-check"></i></button>
+
+
+// SAVE template -- UNUSED save is automatic 
+$('#xslSave').click(function() {
+		// URL: /save/{filename}
+		var url = "/save/" + $('#xslFileName').val();
+
+		// tree "real" (XML) model   
+		var treeRoot = $('#jstree-xsltdata').jstree(true).get_node('rootNode');
+		var xmlnode = treeRoot.original.bound;
+		var xmltext = new XMLSerializer().serializeToString(xmlnode);
+		
+		// POST
+		$.ajax({
+		    url: url,
+		    data: xmltext, 
+		    type: 'POST',
+		    contentType: "text/xml",
+		    dataType: "text",
+		    success : 	function(data, status) {
+		        alert("Data: " + data + "\nStatus: " + status);
+		    	},
+
+			error: function(data, status) {
+			        alert("Data: " + data + "\nStatus: " + status);
+			    	}
+		    }); 
+});
+
+==============================
+
+
+// -------------------------------------------------------- 
+// Add input/actions elements to template 
+//
+
+// add fragment
+$('#copyFragment').click(function() {
+	
+	// source and target trees 
+	var s = $('#jstree-actions').jstree(true);
+	var t = $('#jstree-xsltdata').jstree(true);
+
+	// find fragment to copy and target template node
+	var selectedFragment = s.get_selected(true);
+	var selectedTemplateNode = t.get_selected(true)[0];
+	var node = selectedTemplateNode.original.bound;
+	
+	// create a new node 
+	s.copy(selectedFragment);
+	t.paste(selectedTemplateNode, "last");
+	
+	// redraw
+	t.redraw_node(selectedTemplateNode, true);
+});
+
+
+// deep copy input element into template (backend service)
+// TODO assumes the two docs were saved on server 
+$('#copyInputElement').click(function() {
+
+	var url = "/copy";
+	var xml = $('#xmlFileName').val();
+	var xsl = $('#xslFileName').val();
+
+	// source node
+	s = $('#jstree-xmldata').jstree(true);
+	var selectedInput = s.get_selected(true)[0];
+	var spath = jstreeBinder.getNodeAdress(selectedInput);
+	
+	// target node
+	t = $('#jstree-xsltdata').jstree(true);
+	var selectedTemplateNode = t.get_selected(true)[0];
+	var tpath = jstreeBinder.getNodeAdress(selectedTemplateNode);
+	
+	// backend 
+	$.get("/copy",
+		  {sampleInputFile: xml, templateFile: xsl, sourcePath: spath, templatepath: tpath}, 
+		  function(data) {
+		    	// rebind the new template, and refresh the tree
+		    	xsltTree = jstreeBinder.bind(data);
+		        $('#jstree-xsltdata').jstree(true).settings.core.data = xsltTree;
+		        $('#jstree-xsltdata').jstree(true).refresh();	
+		        alert("Status: " + status);
+		    	}
+		     );
+	
+});
+
+//copy input element 
+$('#copyInputPath').click(function() {
+	
+	// source and target trees 
+	s = $('#jstree-xmldata').jstree(true);
+	t = $('#jstree-xsltdata').jstree(true);
+
+	// find input node to copy and target template node
+	var selectedInput = s.get_selected(true)[0];
+	var snode = selectedInput.original.bound;
+	var path = selectedInput.original.thispath;
+	var selectedTemplateNode = t.get_selected(true)[0];
+	var tnode = selectedTemplateNode.original.bound;
+	
+	// create new node on target tree 
+	var newnode = {
+			text: path, 
+			bound: {},
+			isAttribute: false,
+			state: {opened: false},
+			type: "attrvalue"
+	}
+	t.create_node(selectedTemplateNode, newnode, "last");
+	
+	
+	// redraw
+	t.redraw_node(selectedTemplateNode, true);
+});
+
+
+
+//copy/paste template element 
+$('#copyTemplateNode').click(function() {
+
+	// source template node
+	s = $('#jstree-xsltdata').jstree(true);
+	var selectedTemplateNode = s.get_selected(true)[0];
+	var snode = selectedTemplateNode.original.bound;
+	s.copy(selectedTemplateNode);
+});
+
+$('#pasteTemplateNode').click(function() {
+
+	// target template node
+	t = $('#jstree-xsltdata').jstree(true);
+	var selectedTemplateNode = t.get_selected(true)[0];
+	var tnode = selectedTemplateNode.original.bound;
+	t.paste(selectedTemplateNode, "last");
+});
+
+==================================================================
+
+// ---------------------------------------------------
+// Edit template tree 
+
+$('#createTemplateNode').click(function() {
+	
+	// target template node
+	t = $('#jstree-xsltdata').jstree(true);
+	var selectedTemplateNode = t.get_selected(true)[0];
+	
+	var tnode = selectedTemplateNode.original.bound;
+	
+	// create new node on target tree 
+	var newnode = {
+			text: "new node", 
+			bound: {},
+			isAttribute: false,
+			state: {opened: false},
+			type: "element"
+	}
+	t.create_node(selectedTemplateNode, newnode, "last");
+	
+	// redraw
+	t.redraw_node(selectedTemplateNode, true);
+});
+
+$('#deleteTemplateNode').click(function() {
+	
+	// target template node
+	t = $('#jstree-xsltdata').jstree(true);
+	var selectedTemplateNode = t.get_selected(true)[0];
+	var parent = t.get_parent(selectedTemplateNode);
+	var tnode = selectedTemplateNode.original.bound;
+	
+	// delete 
+	t.delete_node(selectedTemplateNode);
+	
+	// redraw
+	t.redraw_node(parent, true);
+});
+
+=============================================================
+
+// ---------------------------------------------------------
+
+// details pane 
+$('#jstree-xsltdata').on("changed.jstree", function (node, action, selected, event) {
+	  console.log(action.action + ": XSLT tree: " + action.node.id);
+	  if (action.action == "select_node") {
+		  let xmlnode = action.node.original.bound;
+		  let xmlvalue = xmlnode.nodeValue;
+		  $('#xslTextValue').val(xmlvalue);
+	  }
+	});	
+
+$("#applyNewExpr").click(function() {
+	  console.log("apply expression clicked");
+	  let inst = $("#jstree-xsltdata").jstree();
+	  let selected = inst.get_selected(true); //  $("#jstree-xsltdata").jstree("get_selected", true);
+	  if (selected.length != 1) {
+		  alert("you must select a single node");
+	  } else {
+		  let newExpr = $("#xslTextValue").val(); 
+		  console.log("apply new expression " + newExpr + " on node " + selected[0].id );
+		  jstreeBinder.setExpression(selected[0], newExpr);
+		  inst.redraw_node(selected[0], false, false, false);
+	  }
+	});
+

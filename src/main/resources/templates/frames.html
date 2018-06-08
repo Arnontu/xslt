@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>XSLT Editor</title>
+
+<link href="/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+<link href="/jstree-bootstrap/dist/themes/proton/style.css"
+	rel="stylesheet" />
+<link href="/app/css/frames.css" rel="stylesheet">
+</head>
+
+<body>
+
+	<div th:insert="headerTmpl :: nav">...</div>
+
+	<div>
+		<p />
+		<p />
+	</div>
+
+	<div class="container-fluid">
+		<div class="row treeRow">
+			<div class="col-lg-6">
+				<div>
+					<input id="xml-search" type="text" placeholder="search">
+					<div id="jstree-xmldata" class="xmltree"></div>
+				</div>
+			</div>
+			<div class="col-lg-6">
+				<div>
+					<input id="xslt-search" type="text" placeholder="search">
+					<div id="jstree-xsltdata" class="xmltree"></div>
+				</div>
+			</div>
+
+		</div>
+
+		<div class="row detailsRow">
+			<div class="col-lg-6">
+				<form>
+					<div class="form-group">
+						<label for="xmlInputPath">Path</label> <input type="text"
+							class="form-control form-control-sm" id="xmlInputPath"
+							aria-describedby="xmlInputPathHelp" readonly> <small
+							id="xmlInputPathHelp" class="form-text text-muted">XPath
+							to the input node.</small>
+					</div>
+					<div class="form-group">
+						<label for="xmlInputValue">Value</label> <input type="text"
+							class="form-control" id="xmlInputValue"
+							aria-describedby="xmlInputValueHelp" readonly> <small
+							id="xmlInputValueHelp" class="form-text text-muted">value
+							of the input node.</small>
+					</div>
+					<div class="custom-file">
+						<label class="custom-file-label" for="xmlInputFile">Sample input file</label> <input
+							type="file" class="custom-file-input" id="xmlInputFile">
+					</div>
+					<button type="submit" class="btn btn-primary">Test</button>
+				</form>
+			</div>
+			<div class="col-lg-6">
+				<form>
+					<div class="form-group">
+						<label for="xslTextValue">Expression</label> <input type="text"
+							class="form-control" id="xslTextValue"
+							aria-describedby="xslTextValueHelp"> <small
+							id="xslTextValueHelp" class="form-text text-muted">XPath
+							expression</small>
+					</div>
+					 <button id="applyNewExpr" class="btn" onclick="javascript:return false;" >Apply</button>
+					<div class="form-group">
+						<label for="xslTextEval">Evaluates to</label> <input type="text"
+							class="form-control" id="xslTextEval"
+							aria-describedby="xslTextEvalHelp" readonly> <small
+							id="xslTextEvalHelp" class="form-text text-muted">Evaluation
+							of the xpath expression (not impl yet)</small>
+					</div>
+					<div class="form-group">
+						<label for="xslFile">XSLT Template File</label> <input type="file"
+							class="form-control-file" id="xslFile">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<!-- Bootstrap core JavaScript
+    ================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script
+		src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script>
+		window.jQuery
+				|| document
+						.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')
+	</script>
+	<script src="/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="/jstree/dist/jstree.js"></script>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var xmlData = /*[[${xmlData}]]*/'default';
+		var xsltData = /*[[${xsltData}]]*/'default';
+		/*]]>*/
+	</script>
+
+	<script src="/app/js/jstreeBinder.js"></script>
+	<script src="/app/js/mytree.js"></script>
+
+</body>
+</html>
