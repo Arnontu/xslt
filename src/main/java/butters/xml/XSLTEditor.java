@@ -113,38 +113,43 @@ public class XSLTEditor {
 	}
 	
 	/**
-	 * Replace a node with <xsl:value-of> 
+	 * Create or replace element's text node with <xsl:value-of> 
 	 * The xquery selector is either 
 	 *  - a constant equals to the origin value content.
 	 *  - path to origin in sample document 
-	 * 	@param origin	Node to replace 
+	 * 	@param origin	parent element to append/replace with xsl:value-of element 
 	 * 	@param replaceToPath	set the replacing value-of selector to the path of origin node 
 	 * 			(instead of keeping the origin content value). 
-	 * @return
+	 * @return the new value-of node
 	 */
-	public Node replaceWithvalueOf(Node origin, String selector) {
-		logger.debug("replace text with xsl:value-of: " + origin + " to " + selector);
-		Element newnode = origin.getOwnerDocument().createElement("xsl:value-of");
-		Node parent = origin.getParentNode();
+	public Node replaceWithvalueOf(Node elm, String selector) {
+		logger.debug("replace text with xsl:value-of: " + elm + " to " + selector);
+		Element newnode = elm.getOwnerDocument().createElement("xsl:value-of");
 		newnode.setAttribute("select", selector); 
 		
-		parent.removeChild(origin);
-		parent.appendChild(newnode);
+		Node textToRemove = getTextChild(elm);
+		if (textToRemove != null) elm.removeChild(textToRemove);
+		elm.appendChild(newnode);
 		return newnode;
 	}
 
+	public Node getTextChild(Node elm) {
+		NodeList children = elm.getChildNodes(); 
+		for (int i=0; i<children.getLength(); i++) {
+			Node ch = children.item(i);
+			if (ch.getNodeType() == Node.TEXT_NODE) {
+				logger.debug("found text child: " + ch);
+				return ch;
+			}
+		}
+		logger.debug("no text child for " + elm);
+		return null;
+	}
+
 	public Node replaceWithValueof(Node target, Node source) {
-		Node text;
 		String path = getNodePath(source);
 		logger.info("replace text with source path: " + path);
-		try {
-			XMLDocumentDecorator wrap = new XMLDocumentDecorator(target.getOwnerDocument());
-			text = wrap.getNodeByPath(target, "./text()");
-			logger.info("replace text: " + text);
-		} catch (Exception e) {
-			throw new RuntimeException("failed to replace text with xsl:value-of element: " + e.getMessage(), e);
-		}
-		return replaceWithvalueOf(text, path);
+		return replaceWithvalueOf(target, path);
 	}
 
 	/**

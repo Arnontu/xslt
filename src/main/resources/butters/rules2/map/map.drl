@@ -1,5 +1,5 @@
 
-package rules.map;
+package butters.rules2.map;
 
 import butters.rules2.map.RulesContext;
 import butters.rules2.LeftNode;
@@ -20,7 +20,7 @@ global RulesContext $app;
 rule "map element to element"
 when
     $l: LeftNode(value.nodeType == 1)  // element
-    $r: RightNode(value.nodeType == 1)
+    $r: RightNode(value.nodeType == 1, !value.hasChildElement)
     
 then
     $app.getLogger().info("mapping: element to element: " + $r.value + " -->> " + $l.value);

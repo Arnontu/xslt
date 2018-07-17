@@ -46,4 +46,19 @@ public class RightNode extends NodeFact {
 		}
 		return null;
 	}
+	
+	/**
+	 * @return true is element has a child element.  Otherwise returns false. 
+	 */
+	public boolean hasChildElement() {
+		Node node = getValue();
+		NodeList children = node.getChildNodes(); 
+		for (int i=0; i<children.getLength(); i++) {
+			Node ch = children.item(i);
+			if (ch.getNodeType() == Node.ELEMENT_NODE)
+				return true;
+		}
+		return false;
+	}
+
 }
