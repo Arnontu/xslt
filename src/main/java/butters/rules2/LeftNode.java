@@ -6,18 +6,10 @@ import org.w3c.dom.Node;
  * Left side of two-nodes expr (map, match, ...)
  *
  */
-public class LeftNode {
-	private Node value;
+public class LeftNode extends NodeFact {
 
 	public LeftNode(Node n) {
-		this.value = n;
+		super(n);
 	}
 	
-	public Node getValue() {
-		return value;
-	}
-
-	public void setValue(Node value) {
-		this.value = value;
-	}
 }
