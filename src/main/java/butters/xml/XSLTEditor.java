@@ -1,12 +1,11 @@
 package butters.xml;
 
-import static org.junit.Assert.assertNotNull;	
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
 import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -124,6 +123,7 @@ public class XSLTEditor {
 	 * @return
 	 */
 	public Node replaceWithvalueOf(Node origin, String selector) {
+		logger.debug("replace text with xsl:value-of: " + origin + " to " + selector);
 		Element newnode = origin.getOwnerDocument().createElement("xsl:value-of");
 		Node parent = origin.getParentNode();
 		newnode.setAttribute("select", selector); 
@@ -132,7 +132,21 @@ public class XSLTEditor {
 		parent.appendChild(newnode);
 		return newnode;
 	}
-	
+
+	public Node replaceWithValueof(Node target, Node source) {
+		Node text;
+		String path = getNodePath(source);
+		logger.info("replace text with source path: " + path);
+		try {
+			XMLDocumentDecorator wrap = new XMLDocumentDecorator(target.getOwnerDocument());
+			text = wrap.getNodeByPath(target, "./text()");
+			logger.info("replace text: " + text);
+		} catch (Exception e) {
+			throw new RuntimeException("failed to replace text with xsl:value-of element: " + e.getMessage(), e);
+		}
+		return replaceWithvalueOf(text, path);
+	}
+
 	/**
 	 * @param origin	node to delete
 	 * @return			parent node

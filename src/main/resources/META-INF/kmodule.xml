@@ -2,12 +2,8 @@
 <kmodule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://www.drools.org/xsd/kmodule">
 
-    <kbase packages="rules.minimize" >
-        <ksession name="repeating"/>
-    </kbase>
-
     <kbase packages="rules.map" >
-        <ksession name="compare"/>
+        <ksession name="MapKS"/>
     </kbase>
 
 </kmodule>
