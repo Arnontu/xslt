@@ -1,14 +1,13 @@
 package butters.rules2.map;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.w3c.dom.Node;
 
@@ -37,8 +36,12 @@ public class MapServiceIntegrationTest extends BaseTest {
 		XMLDocumentDecorator doc2 = new XMLDocumentDecorator(resource("rules/hello2.xslt"));
 		Node trgt = doc2.getNodeByPath("//butters");
 		srv.map(src, trgt);
-		
-		fail("Not yet implemented");
+
+		Node after = doc2.getNodeByPath(trgt, "xsl:value-of");
+		assertNotNull("xsl:value-of element", after);
+		Node selector = doc2.getNodeByPath(after, "@select");
+		assertNotNull("@select attribute", selector);
+		assertEquals("@select attribute", "/butters", selector.getNodeValue() );
 	}
 
 }

@@ -18,9 +18,9 @@ public abstract class AbstractRuleContext {
 		editor.replaceWithValueof(target, source);
 	}
 	
-//	public void setAttributeValue(Node parentElmNode, String attr,  String value) {
-//		
-//	}
+	public void setPathAttribute(Node parentElmNode, String attr, Node source) {
+		
+	}
 
 	public Logger getLogger() {
 		return logger;

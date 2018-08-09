@@ -9,7 +9,8 @@ function xsltServices()  {
 			save: "/save",
 			setvalue: "/api/xslt/setvalue",
 			map: "/api/xslt/map",
-			run: "/api/xslt/run"
+			run: "/api/xslt/run", 
+			load: "/api/xslt/load"
 		},
 		
 		// prototype object of editor service request
@@ -64,7 +65,7 @@ function xsltServices()  {
 				}
 			 }); 
 		},
-		
+
 		// set text value or rename element
 		setvalue: function(rq, callback) {
 			this.post(this.urls.setvalue, rq, callback);
@@ -78,8 +79,13 @@ function xsltServices()  {
 		// test: apply the XSLT template on sample input 
 		run: function(rq, callback) {
 			 this.post(this.urls.run, rq, callback);
+		},
+
+		// load: load/refresh the XSLT template from server 
+		load: function(rq, callback) {
+			 this.post(this.urls.load, rq, callback);
 		}
-		
+
 	};  // return func
 	
 };

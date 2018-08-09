@@ -1,6 +1,7 @@
 
 
 // JS Trees: input, template, output
+// TODO decouple from template/html (remove html ref constants)
 
 var xmlTree = jstreeBinder.bind(xmlData);
 var xsltTree = jstreeBinder.bind(xsltData);
@@ -91,7 +92,7 @@ $('#jstree-xmldata').jstree({
   	    'data' : xmlTree
   	  },
   	  "types" : types,
-  	  "plugins" : ["search", "wholerow", "types"]
+  	  "plugins" : ["search", "wholerow", "types", "dnd"]
 });
 
 $('#jstree-xsltdata').jstree({
@@ -101,8 +102,9 @@ $('#jstree-xsltdata').jstree({
 	  	    "themes" : { "stripes" : true },
 	  	    'data' : xsltTree
 	  },
+	  "dnd": {"always_copy": true},
   	  "types" : types,
-  	  "plugins" : ["search", "wholerow", "types"]
+  	  "plugins" : ["search", "wholerow", "types", "dnd"]
 });
 
 
@@ -289,5 +291,41 @@ function bindAndRedrawTemplate(jstree) {
 		jstree.refresh(true); 	// TODO optimize: redraw only changed nodes
 	}
 };
+
+
+// --------------------------------------------------------
+// copy node event
+// 1. copy from INPUT to XSLT is treated as a "(flat) map" gesture: instead of 
+// copying the actual source node, we copy only the reference to the node ("value-of").
+// 2. copy between two nodes of XSLT will do nothing -- we simply refresh the tree.
+// 3. copy of "fragment" is treated as "create" gesture. the actual content of the source fragment 
+// is ignored. the server decides what elements to create. 
+
+$('#jstree-xsltdata').on('copy_node.jstree', function (event, data) {
+	var inputTree = data.old_instance;
+	var selectedInput = inputTree.get_node(data.original.id);
+	var inputNode = selectedInput.original.bound.node;
+
+	var templateTree = data.new_instance;
+	var selectedTemplateNode = templateTree.get_node(data.parent); 
+	var templateNode = selectedTemplateNode.original.bound.node;
+	
+	if (inputTree == templateTree) { // same tree copy -- ignore, and refresh
+		var rq = editorServices.requestPrototype();
+		rq.action = "LOAD";
+		rq.targetTree = $('#xslFileName').val();
+		editorServices.load(rq, bindAndRedrawTemplate(templateTree));
+
+	} else {  // input to template: map
+		var rq = editorServices.requestPrototype();
+		rq.action = "MAP";
+		rq.fromTree = $('#xmlFileName').val();
+		rq.fromNode = inputNode;
+		rq.targetTree = $('#xslFileName').val();
+		rq.targetNode = templateNode;
+		editorServices.map(rq, bindAndRedrawTemplate(templateTree)); // a-sync
+	}
+});
+
 
 

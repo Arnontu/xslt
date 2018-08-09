@@ -13,6 +13,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -20,7 +21,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-@Service
+@Component
 public class XSLTEditor {
 	
 	Logger logger = LoggerFactory.getLogger(XSLTEditor.class);
@@ -124,7 +125,7 @@ public class XSLTEditor {
 	 */
 	public Node replaceWithvalueOf(Node elm, String selector) {
 		logger.debug("replace text with xsl:value-of: " + elm + " to " + selector);
-		Element newnode = elm.getOwnerDocument().createElement("xsl:value-of");
+		Element newnode = elm.getOwnerDocument().createElementNS("http://www.w3.org/1999/XSL/Transform", "xsl:value-of");
 		newnode.setAttribute("select", selector); 
 		
 		Node textToRemove = getTextChild(elm);

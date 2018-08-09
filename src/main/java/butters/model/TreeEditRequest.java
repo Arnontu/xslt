@@ -6,7 +6,8 @@ public class TreeEditRequest {
 			NEWTEMPLATE, 
 			INSERT, DELETE, COPYPASTE, SETVALUE,
 			DEEPCOPY, MAP,
-			RUN
+			RUN,
+			LOAD
 		};
 		
 		public static enum FRAGMENT {VALUEOF, COPYOF, FOREACH, IF} 

@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ import org.w3c.dom.Node;
 import butters.model.TreeDTO;
 import butters.model.TreeEditRequest;
 import butters.model.TreeNodeDTO;
+import butters.rules2.map.NodeMappingService;
 import butters.storage.StorageService;
 import butters.xml.XMLDocumentDecorator;
 import butters.xml.XSLTEditor;
@@ -33,9 +35,20 @@ public class RestController {
 	@Autowired	XSLTEditor editor;
 	@Autowired XSLTTransform transformer;
 	@Autowired StorageService storage;
+	@Autowired NodeMappingService mapper;
 	
 	Logger logger = LoggerFactory.getLogger(RestController.class);
 
+	@PostMapping("/load")
+	public @ResponseBody TreeDTO load(@RequestBody TreeEditRequest req) throws Exception {
+		logger.debug(req.toString());
+		Path templFile = storage.load(req.getTargetTree());
+		XMLDocumentDecorator tmdoc = new XMLDocumentDecorator(templFile.toFile());
+		TreeDTO tree = TreeDTOBuilder.builder().from(tmdoc.getRoot()).build();
+		return tree;
+	}
+	
+	
 	@PostMapping("/map")
 	public @ResponseBody TreeDTO map(@RequestBody TreeEditRequest req) throws Exception {
 		logger.debug(req.toString());
@@ -53,6 +66,11 @@ public class RestController {
 		Node inputnode = indoc.getNodeByOrdinal((int) req.getFromNode().getId());
 		logger.debug("map: source node: " + inputnode);
 
+		// mapping service 
+		mapper.map(inputnode, templnode);
+		dirty = true;   // service method is void, but throws in case of errors
+		// TODO cleaner dirty and error reporting 
+		
 		// save and return templ doc
 		if (dirty) {
 			logger.debug("map: saving updated template ... ");

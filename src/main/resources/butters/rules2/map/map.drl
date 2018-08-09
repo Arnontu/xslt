@@ -4,6 +4,7 @@ package butters.rules2.map;
 import butters.rules2.map.RulesContext;
 import butters.rules2.LeftNode;
 import butters.rules2.RightNode;
+import butters.rules2.ResultBean;
 
 
 import org.w3c.dom.Node;
@@ -17,12 +18,47 @@ dialect  "mvel"
 
 global RulesContext $app;
 
+//    activation-group "mapnodes"
+
 rule "map element to element"
 when
-    $l: LeftNode(value.nodeType == 1)  // element
-    $r: RightNode(value.nodeType == 1, !value.hasChildElement)
-    
+    $l: LeftNode(elementNode)  // element
+    $r: RightNode(elementNode && leafNode && !xslNode)
 then
-    $app.getLogger().info("mapping: element to element: " + $r.value + " -->> " + $l.value);
-    $app.replaceWithValueof($r.value, $l.value);
+    insert(new ResultBean("info", "then: replace text with XSL value-of: " + $r.value));
+    $app.replaceWithvalueOf($r.value, $l.value);
+end
+
+rule "update value-of selector"
+when
+    $l: LeftNode(elementNode)  // element
+    $r: RightNode(elementNode && leafNode && xslNodeTag == "value-of")
+then
+    insert (new ResultBean("info", "then: update value-of selector: " + $r.value));
+    $app.setPathAttribute($r.value, "select", $l.value);
+end
+
+rule "update for-each selector"
+when
+    $l: LeftNode(elementNode)  // element
+    $r: RightNode(elementNode && leafNode && xslNodeTag == "for-each")
+then
+    insert (new ResultBean("info", "then: update for-each selector: " + $r.value));
+    $app.setPathAttribute($r.value, "select", $l.value);
+end
+
+rule "map from element to attribute"
+when
+    $l: LeftNode(elementNode)  // element
+    $r: RightNode(attributeNode) // attribute
+then
+    $r.setValue( ((org.w3c.dom.Attr) $r.getValue()).getOwnerElement());
+    update($r);
+end
+ 
+///////////////////////////////////////////////
+
+// result is the target node 
+query result() 
+    result: ResultBean();
 end

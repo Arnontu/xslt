@@ -16,13 +16,19 @@ public class NodeMappingService {
 	@Autowired Provider<RulesContext> contextProvider;
 	
 	public void map(Node src, Node trgt) {
-		getRulesRunner()
+		RulesRunner runner = getRulesRunner()
 			.withKnowledgeSesssion("MapKS")
 			.debug(true)
 			.withGlobal("$app", getRulesContext())
 			.insert(new LeftNode(src))
-			.insert(new RightNode(trgt))
-			.fire();
+			.insert(new RightNode(trgt));
+
+		try {
+			runner.fire();
+			if (runner.failed()) throw new RuntimeException("failed to map nodes");  // TODO get the errors message
+		} finally { 
+			runner.dispose();
+		}
 	}
 	
 	
@@ -32,5 +38,5 @@ public class NodeMappingService {
 
 	private RulesContext getRulesContext() {
         return contextProvider.get();
-    }
+	}
 }

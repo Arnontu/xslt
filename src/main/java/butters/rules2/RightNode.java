@@ -1,5 +1,7 @@
 package butters.rules2;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -9,6 +11,8 @@ import org.w3c.dom.NodeList;
  */
 public class RightNode extends NodeFact {
 	
+	static Logger logger = LoggerFactory.getLogger(RightNode.class);
+	
 	public RightNode(Node n) {
 		super(n);
 	}
@@ -16,12 +20,13 @@ public class RightNode extends NodeFact {
 	/**
 	 * @return	XSL tag name (valueof, foreach, ...) or "false" if not an XML element
 	 */
-	public String xslNodeTag() {
+	public String getXslNodeTag() {
 		Node node = getValue();
     	if ((node != null) && (Node.ELEMENT_NODE == node.getNodeType())) {	// element node
    			String ns = node.getNamespaceURI();
    			if (ns != null && ns.contains("/XSL/")) { 						// namespace contains "XSL"
    				String tag = node.getLocalName();
+   				logger.debug(getValue() + ": xsl node tag: " + tag);
    				return tag;
    			}
     	}
@@ -29,7 +34,7 @@ public class RightNode extends NodeFact {
 	}
 
 	public boolean isXslNode() {
-		String tag = xslNodeTag();
+		String tag = getXslNodeTag();
 		return ("false".equalsIgnoreCase(tag))? false : true;
 	}
 
@@ -41,8 +46,10 @@ public class RightNode extends NodeFact {
 		NodeList children = node.getChildNodes(); 
 		for (int i=0; i<children.getLength(); i++) {
 			Node ch = children.item(i);
-			if (ch.getNodeType() == Node.TEXT_NODE)
+			if (ch.getNodeType() == Node.TEXT_NODE) {
+				logger.debug(getValue() + ": text child: " + ch);
 				return ch;
+			}
 		}
 		return null;
 	}
@@ -55,10 +62,17 @@ public class RightNode extends NodeFact {
 		NodeList children = node.getChildNodes(); 
 		for (int i=0; i<children.getLength(); i++) {
 			Node ch = children.item(i);
-			if (ch.getNodeType() == Node.ELEMENT_NODE)
+			if (ch.getNodeType() == Node.ELEMENT_NODE) {
+				logger.debug(getValue() + ": first element child: " + ch);
 				return true;
+			}
 		}
+		logger.debug(getValue() + ": no element chidren");
 		return false;
+	}
+	
+	public boolean isLeafNode() {
+		return !hasChildElement();
 	}
 
 }

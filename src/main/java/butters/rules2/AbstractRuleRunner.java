@@ -7,6 +7,8 @@ import org.kie.api.logger.KieRuntimeLogger;
 import org.kie.api.runtime.Globals;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.QueryResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 import org.kie.internal.logger.KnowledgeRuntimeLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -66,6 +68,20 @@ public abstract class AbstractRuleRunner<T> {
 	public T insert(Object fact) {
 		session.insert(fact);
 		return (T) this;
+	}
+
+	public boolean failed() {
+		QueryResults errors = session.getQueryResults("errors");
+		for ( QueryResultsRow err : errors ) {
+			    System.out.println( err.get( "error" ) );
+		}
+
+		QueryResults results = session.getQueryResults("result");
+		for ( QueryResultsRow row : results ) {
+			    System.out.println( row.get( "result" ) );
+		}
+		
+		return (errors.size() > 0);
 	}
 	
 	public T withGlobal(String key, Object value) {
