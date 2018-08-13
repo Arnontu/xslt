@@ -70,15 +70,12 @@ public class EditController {
     		
     		) throws ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException {
     	
-    	Node xslDoc;
-    	
 //    	JsonNode xmlData = getJsonData(xmlFileName);
     	logger.info(String.format("enter template editor: %s, %s, %s, %s", xmlFileName, xslFileName, outFileName, createMode));
     	
     	// create new EMPY template 
     	if ("EMPTY".equalsIgnoreCase(createMode)) {
     		Document doc = editor.createEmptyTemplate(storage.load("templatePrototype.xsl").toString());
-    		xslDoc = doc.getDocumentElement();
     		saveDocument(xslFileName, doc);
     		
     	// create from SAMPLE
@@ -87,39 +84,27 @@ public class EditController {
     		Document sample = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
     		Document empty = editor.createEmptyTemplate(storage.load("templatePrototype.xsl").toString());
     		Document doc = editor.createFromSample(sample, empty);
-    		xslDoc = doc.getDocumentElement();
+    		Node xslDoc = doc.getDocumentElement();
     		saveDocument(xslFileName, doc);
-    	
-    	// OPEN existing
+
+    	} else if (!isDocExists(xslFileName)) {    // if not exists, treat as EMPTY (TODO soemthing more resonable)
+    		Document doc = editor.createEmptyTemplate(storage.load("templatePrototype.xsl").toString());
+    		saveDocument(xslFileName, doc);
+    		
+    	// OPEN existing -- noothing to do 
     	} else {
-        	xslDoc = loadDocument(xslFileName);
     	}
     	
-    	Node xmlDoc;
-		try {
-			xmlDoc = loadDocument(xmlFileName);
-		} catch (IOException e) {    // no such doc. create empty doc.
+    	if (!isDocExists(xmlFileName)) {    // no input doc. create empty doc.
     		Document doc = editor.createEmptyTemplate(storage.load("xmlfilePrototype.xsl").toString());
-    		xmlDoc = doc.getDocumentElement();
     		saveDocument(xmlFileName, doc);
 		}
-		
-    	Node outputDoc;
-		try {
-			outputDoc = loadDocument(outFileName);
-		} catch (IOException e) {
+
+    	if (!isDocExists(outFileName)) {    // no output doc. create empty doc.
     		Document doc = editor.createEmptyTemplate(storage.load("xmlfilePrototype.xsl").toString());
-    		outputDoc = doc.getDocumentElement();
     		saveDocument(outFileName, doc);
 		}
 		
-    	TreeDTO xmlData = TreeDTOBuilder.builder().from(xmlDoc).build(); 
-    	TreeDTO xslData = TreeDTOBuilder.builder().from(xslDoc).build();
-    	TreeDTO outputData = TreeDTOBuilder.builder().from(outputDoc).build();
-    	
-    	model.addAttribute("xmlData", xmlData);
-    	model.addAttribute("xsltData", xslData);
-    	model.addAttribute("outputData", outputData);
     	model.addAttribute("xmlFileName", xmlFileName);
     	model.addAttribute("xslFileName", xslFileName);
     	model.addAttribute("outFileName", outFileName);
@@ -155,6 +140,11 @@ public class EditController {
     	return tdoc;	// return updated template
     }
     
+    
+    protected boolean isDocExists(String xmlFileName) {
+    	File f = storage.load(xmlFileName).toFile();
+    	return (f != null) && f.isFile() && f.exists();
+    }
     
     // load document from file 
     // TODO use storage service

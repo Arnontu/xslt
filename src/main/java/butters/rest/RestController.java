@@ -39,6 +39,11 @@ public class RestController {
 	
 	Logger logger = LoggerFactory.getLogger(RestController.class);
 
+	/**
+	 * @param req
+	 * @return
+	 * @throws Exception
+	 */
 	@PostMapping("/load")
 	public @ResponseBody TreeDTO load(@RequestBody TreeEditRequest req) throws Exception {
 		logger.debug(req.toString());
@@ -49,6 +54,11 @@ public class RestController {
 	}
 	
 	
+	/**
+	 * @param req
+	 * @return
+	 * @throws Exception
+	 */
 	@PostMapping("/map")
 	public @ResponseBody TreeDTO map(@RequestBody TreeEditRequest req) throws Exception {
 		logger.debug(req.toString());
@@ -80,6 +90,12 @@ public class RestController {
 		return tree;
 	}
 	
+	/**
+	 * @param req
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws Exception
+	 */
 	@PostMapping("/setvalue")
 	public @ResponseBody TreeDTO setvalue(@RequestBody TreeEditRequest req) throws FileNotFoundException, Exception {
 		logger.debug(req.toString());
@@ -120,8 +136,13 @@ public class RestController {
 	}
 	
 	
-    // test template and save the result 
-    // input & teamplate already saved
+    /**
+     * test template and save the result.
+     * input & teamplate already saved.
+     * @param req
+     * @return
+     * @throws Exception
+     */
     @PostMapping("/run")
     public @ResponseBody TreeDTO handleXsltTest(@RequestBody TreeEditRequest req) throws Exception 
     {
@@ -136,6 +157,16 @@ public class RestController {
 		TreeDTO outputData = TreeDTOBuilder.builder().from(doc.getRoot()).build();
     	return outputData;
     }
+
+
+    /**
+     * @param rq
+     * @return
+     */
+    @PostMapping("/insert")
+	public TreeDTO insert(TreeEditRequest rq) {
+		return null;
+	}
 
 
 }

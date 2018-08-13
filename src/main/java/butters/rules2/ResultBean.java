@@ -30,4 +30,9 @@ public class ResultBean {
 		return level;
 	}
 
+	@Override
+	public String toString() {
+		return ("{ level: " + level + ", message: " + message + "}");
+	}
+
 }

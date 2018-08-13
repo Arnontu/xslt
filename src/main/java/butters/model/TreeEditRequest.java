@@ -10,8 +10,6 @@ public class TreeEditRequest {
 			LOAD
 		};
 		
-		public static enum FRAGMENT {VALUEOF, COPYOF, FOREACH, IF} 
-
 		// --------------------------------
 
 		protected ACT action;
@@ -22,7 +20,6 @@ public class TreeEditRequest {
 		protected String targetTree;
 		protected TreeNodeDTO targetNode;
 
-		protected FRAGMENT fromFragment;
 		protected String newValue;
 		protected String templateTree;
 		
@@ -30,12 +27,12 @@ public class TreeEditRequest {
 
 		public String toString() {
 			return (new StringBuffer("edit request: {")
+					.append("action: " + action + "; ")
 					.append("fromTree: " + fromTree + "; ")
 					.append("fromNode: " + fromNode + "; ")
 					.append("targetTree: " + targetTree + "; ")
 					.append("targetTree: " + targetNode + "; ")
 					.append("templateTree: " + templateTree + "; ")
-					.append("fragment: " + fromFragment + "; ")
 					.append("newvalue: " + newValue + "; ")
 					).toString();
 		}
@@ -54,14 +51,6 @@ public class TreeEditRequest {
 
 		public void setFromNode(TreeNodeDTO fromNode) {
 			this.fromNode = fromNode;
-		}
-
-		public FRAGMENT getFromFragment() {
-			return fromFragment;
-		}
-
-		public void setFromFragment(FRAGMENT fromFragment) {
-			this.fromFragment = fromFragment;
 		}
 
 		public ACT getAction() {

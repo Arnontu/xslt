@@ -1,12 +1,33 @@
 
 
-// JS Trees: input, template, output
-// TODO decouple from template/html (remove html ref constants)
-
-var xmlTree = jstreeBinder.bind(xmlData);
-var xsltTree = jstreeBinder.bind(xsltData);
-var outputTree = jstreeBinder.bind(outputData);
 var editorServices = xsltServices();
+
+
+var editorModel = {
+	xmlFileName: "na",
+	xslFileName: "na" ,
+	outFileName: "na",
+	fragmentPrototypeFileName: "fragmentsPrototype.xsl"
+	// trees data?  
+};
+
+var bind = {
+	xmlTree: "na",
+	xslTree: "na",
+	outputTree: "na",
+	
+	inputFileName: "na",
+	xslFileName: "na",
+	fragmentsFileName: "na",
+	
+	bind: function(jq) {
+		this.xmlTree = jq('#jstree-xmldata').jstree(true);
+		this.xstTree = jq('#jstree-xsltdata').jstree(true);
+		this.outputTree = jq('#jstree-outdata').jstree(true);
+		this.fragmentsTree = jq('#jstree-fragments').jstree(true);
+	}
+	
+};
 
 // types of nodes in XML tree 
 var types = {
@@ -32,108 +53,83 @@ var types = {
     }
 };
 	
-var fragmentsTree = [
-	{"id": "rootNode", "text":"Fragments", "type":"root", "state": {"opened":true}, "children": [
 
-		// XSL value-of
-		{"id": "valueof", "text":"xsl:value-of", "type":"xsl","children": [
-			{"id": "value-select", "text":"xsl:select", "type":"element","children": [
-				{"id": "value-select-text", "text":"xquery expression", "type":"text"}
-			]}
-		]},
-		
-		// XSL copy-of
-		{"id": "copyof", "text":"xsl:copy-of", "type":"xsl","children": [
-			{"id": "copy-select", "text":"xsl:select", "type":"element","children": [
-				{"id": "copy-select-text", "text":"xquery expression", "type":"text"}
-			]}
-		]},
 
-		// XSL for each 
-		{"id": "foreach", "text":"xsl:for-each", "type":"xsl","children": [
-			{"id": "for-select", "text":"xsl:select", "type":"element","children": [
-				{"id": "for-select-text", "text":"xquery expression", "type":"text"}
-			]}
-		]},
-		
-		// XSL if 
-		{"id": "xslif", "text":"xsl:if", "type":"xsl","children": [
-			{"id": "xslif", "text":"xsl:test", "type":"element","children": [
-				{"id": "xslif-test-text", "text":"xquery expression", "type":"text"}
-			]}
-		]},
-		
-		// XSL choose when* 
-		{"id": "choose", "text":"xsl:choose", "type":"xsl","children": [
-			{"id": "choose-when", "text":"xsl:when", "type":"xsl","children": [
-				{"id": "when-test", "text":"xsl:test", "type":"element","children": [
-					{"id": "when-test-text", "text":"xquery expression", "type":"text"}
-				]}
-			]}
-		]},
 
-		// XSL attribute 
-		{"id": "attribute", "text":"xsl:attribute", "type":"xsl","children": [
-			{"id": "name", "text":"xsl:name", "type":"xsl"},
-			{"id": "attrvalueof", "text":"xsl:value-of", "type":"xsl","children": [
-				{"id": "attr-value-select", "text":"xsl:select", "type":"element","children": [
-					{"id": "attr-value-select-text", "text":"xquery expression", "type":"text"}
-				]}
-			]},
-		]},
-	]}
-];
+// -----------------------------------------------
+// READY 
+// load default view trees
 
-$('#jstree-xmldata').jstree({
-  	  "core" : {
-  	    "animation" : 0,
-  	    "check_callback" : false,
-  	    "themes" : { "stripes" : true },
-  	    'data' : xmlTree
-  	  },
-  	  "types" : types,
-  	  "plugins" : ["search", "wholerow", "types", "dnd"]
+$(document).ready(function() { 
+	initTrees();
+	bind.bind($);
+	initModel();
+	
+	loadInputTree();
+	loadTemplateTree();
+
 });
 
-$('#jstree-xsltdata').jstree({
-	  "core" : {
-	  	    "animation" : 0,
-	  	    "check_callback" : true,
-	  	    "themes" : { "stripes" : true },
-	  	    'data' : xsltTree
-	  },
-	  "dnd": {"always_copy": true},
-  	  "types" : types,
-  	  "plugins" : ["search", "wholerow", "types", "dnd"]
-});
+function initModel() {
+	// file names -- TODO return in context object
+	this.editorModel.outFileName = $('#outFileName').val();
+	this.editorModel.xslFileName = $('#xslFileName').val();
+	this.editorModel.xmlFileName = $('#xmlFileName').val();
+};
 
+function initTrees() {
 
-$('#jstree-outdata').jstree({
-	  "core" : {
-	  	    "animation" : 0,
-	  	    "check_callback" : false,
-	  	    "themes" : { "stripes" : true },
-	  	    'data' : outputTree
-	  	  },
-	  	  "types" : types,
-	  	  "plugins" : ["search", "wholerow", "types"]
-});
-
-
-$('#jstree-fragments').jstree({
-	  "core" : {
-	  	    "animation" : 0,
-	  	    "check_callback" : function(op, node, parent, pos, mor) {return op === 'create_node' ? true : false;},
-	  	    "themes" : { "stripes" : true },
-	  	    'data' : fragmentsTree
-	  	  },
-	  	  "types" : types,
-	  	  "plugins" : ["wholerow", "types"],
-	  	  "checkbox" : {"three_state":false}
+	$('#jstree-xmldata').jstree({
+		  "core" : {
+		    "animation" : 0,
+		    "check_callback" : false,
+		    "themes" : { "stripes" : true },
+		    'data' : {"id": "rootNode", "text":"Input", "type":"root"}
+		  },
+		  "types" : types,
+		  "plugins" : ["search", "wholerow", "types", "dnd"]
+	});
+	
+	$('#jstree-xsltdata').jstree({
+		  "core" : {
+		  	    "animation" : 0,
+		  	    "check_callback" : true,
+		  	    "themes" : { "stripes" : true },
+		  	    'data' : {"id": "rootNode", "text":"Template", "type":"root"}
+		  },
+		  "dnd": {"always_copy": true},
+		  "types" : types,
+		  "plugins" : ["search", "wholerow", "types", "dnd"]
+	});
+	
+	
+	$('#jstree-outdata').jstree({
+		  "core" : {
+		  	    "animation" : 0,
+		  	    "check_callback" : false,
+		  	    "themes" : { "stripes" : true },
+		  	    'data' : {"id": "rootNode", "text":"Output", "type":"root"}
+		  	  },
+		  	  "types" : types,
+		  	  "plugins" : ["search", "wholerow", "types"]
 	});
 
 
+	$('#jstree-fragments').jstree({
+		  "core" : {
+		  	    "animation" : 0,
+		  	    "check_callback" : function(op, node, parent, pos, mor) {return op === 'create_node' ? true : false;},
+		  	    "themes" : { "stripes" : true },
+		  	    'data' : {"id": "rootNode", "text":"Fragments", "type":"root"}
+		  	  },
+		  	  "types" : types,
+		  	  "plugins" : ["wholerow", "types"],
+		  	  "checkbox" : {"three_state":false}
+		});
 
+};
+
+// ------------------------------------------------
 // search box -- 
 $('#xml-search').keyup(function () {
     var v = $('#xml-search').val();
@@ -150,21 +146,6 @@ $('#output-search').keyup(function () {
 
 
 
-//---------------------------------------------------------
-//rebind and redraw a tree with a POST response 
-//
-// parameters:
-// @jstree   JSTree instance,such as $('#jstree-outdata').jstree(true)
-//
-
-function bindAndRedrawTemplate(jstree) {
-	return function(data) {
-		jstree.settings.core.data = jstreeBinder.bind(data);
-		jstree.refresh(true); 	// TODO optimize: redraw only changed nodes
-	}
-};
-
-
 // ---------------------------------------------------------
 // Test button
 
@@ -173,10 +154,10 @@ $('#xslRun').click(function() {
 	
 	var rq = editorServices.requestPrototype();
 	rq.action = "RUN";
-	rq.fromTree = $('#xmlFileName').val();
-	rq.targetTree = $('#outFileName').val();
-	rq.templateTree = $('#xslFileName').val();
-	editorServices.run(rq, bindAndRedrawTemplate(outputTree));
+	rq.fromTree = editorModel.xmlFileName;
+	rq.targetTree = editorModel.outFileName;
+	rq.templateTree = editorModel.xslFileName
+	editorServices.run(rq, bindAndRedrawTree(outputTree));
 });
 
 
@@ -184,6 +165,9 @@ $('#xslRun').click(function() {
 // hide/show in/out/frag tree 
 
 $('#showInput').click(function() {
+	
+	loadInputTree();
+
 	$('[inputColumn]').removeAttr('hidden');
 	$('[outputColumn]').attr('hidden', true);
 	$('[fragmentsColumn]').attr('hidden', true);
@@ -194,6 +178,9 @@ $('#showInput').click(function() {
 });
 
 $('#showOutput').click(function() {
+	
+	loadOutputTree();
+	
 	$('[inputColumn]').attr('hidden', true);
 	$('[outputColumn]').removeAttr('hidden');
 	$('[fragmentsColumn]').attr('hidden', true);
@@ -204,6 +191,9 @@ $('#showOutput').click(function() {
 });
 
 $('#showFragments').click(function() {
+	
+	loadFragmentsTree();
+	
 	$('[inputColumn]').attr('hidden', true);
 	$('[outputColumn]').attr('hidden', true);
 	$('[fragmentsColumn]').removeAttr('hidden');
@@ -212,6 +202,36 @@ $('#showFragments').click(function() {
 	$('#showOutput').removeClass("btn-outline-warning").addClass("btn-warning");
 	$('#showFragments').removeClass("btn-warning").addClass("btn-outline-warning");
 });
+
+// ------------------------------------------------------
+// load tree
+
+function loadTree(fileName, treeInstance) {
+	var rq = editorServices.requestPrototype();
+	rq.action = "LOAD";
+	rq.targetTree = fileName; // TODO move to better place 
+	editorServices.load(rq, bindAndRedrawTree(treeInstance));
+}
+
+function emptyTree(title) {
+	return {"id": "rootNode", "text": title, "type":"root"}
+};
+
+function loadFragmentsTree() {
+	loadTree(editorModel.fragmentPrototypeFileName, $('#jstree-fragments').jstree(true))
+};
+
+function loadInputTree() {
+	loadTree(editorModel.xmlFileName, $('#jstree-xmldata').jstree(true))
+};
+
+function loadTemplateTree() {
+	loadTree(editorModel.xslFileName, $('#jstree-xsltdata').jstree(true))
+};
+
+function loadOutputTree() {
+	loadTree(editorModel.outFileName, $('#jstree-outdata').jstree(true))
+};
 
 
 // ------------------------------------------------------
@@ -239,7 +259,7 @@ $('#copyInputPath').click(function() {
 	rq.fromNode = inputNode;
 	rq.targetTree = $('#xslFileName').val();
 	rq.targetNode = templateNode;
-	editorServices.map(rq, bindAndRedrawTemplate(templateTree)); // a-sync
+	editorServices.map(rq, bindAndRedrawTree(templateTree)); // a-sync
 });
 
 
@@ -251,7 +271,7 @@ $('#copyInputPath').click(function() {
 $('#editTextModal').on('show.bs.modal', function (event) {
 	
 	// target template node
-	t = $('#jstree-xsltdata').jstree(true);
+	var t = $('#jstree-xsltdata').jstree(true);
 	if (t.get_selected(true).size > 0) {
 		alert("select only single node in the template tree");
 		return false;
@@ -280,18 +300,22 @@ $('#editTextModal').on('hide.bs.modal', function (event) {
 	rq.newValue =  $('#xqueryTextArea').val();
 	rq.targetTree = $('#xslFileName').val();
 	rq.targetNode = tnode.node;
-	editorServices.setvalue(rq, bindAndRedrawTemplate(t)); // a-sync
+	editorServices.setvalue(rq, bindAndRedrawTree(t)); // a-sync
 });
 
 //---------------------------------------------------------
-// bind and redraw 
-function bindAndRedrawTemplate(jstree) {
+//rebind and redraw a tree with a POST response 
+//
+//parameters:
+//@jstree   JSTree instance,such as $('#jstree-outdata').jstree(true)
+//
+
+function bindAndRedrawTree(jstree) {
 	return function(data) {
 		jstree.settings.core.data = jstreeBinder.bind(data);
 		jstree.refresh(true); 	// TODO optimize: redraw only changed nodes
 	}
 };
-
 
 // --------------------------------------------------------
 // copy node event
@@ -310,21 +334,33 @@ $('#jstree-xsltdata').on('copy_node.jstree', function (event, data) {
 	var selectedTemplateNode = templateTree.get_node(data.parent); 
 	var templateNode = selectedTemplateNode.original.bound.node;
 	
+	var x = $('#jstree-xmldata').jstree(true);
+	var f = $('#jstree-fragments').jstree(true);
+	
 	if (inputTree == templateTree) { // same tree copy -- ignore, and refresh
 		var rq = editorServices.requestPrototype();
 		rq.action = "LOAD";
 		rq.targetTree = $('#xslFileName').val();
-		editorServices.load(rq, bindAndRedrawTemplate(templateTree));
+		editorServices.load(rq, bindAndRedrawTree(templateTree));
 
-	} else {  // input to template: map
+	} else if (inputTree == x) {  // input xml to template: map
 		var rq = editorServices.requestPrototype();
 		rq.action = "MAP";
 		rq.fromTree = $('#xmlFileName').val();
 		rq.fromNode = inputNode;
 		rq.targetTree = $('#xslFileName').val();
 		rq.targetNode = templateNode;
-		editorServices.map(rq, bindAndRedrawTemplate(templateTree)); // a-sync
-	}
+		editorServices.map(rq, bindAndRedrawTree(templateTree)); // a-sync
+	} else if (inputTree == f) {  // fragments to template: map
+		var rq = editorServices.requestPrototype();
+		rq.action = "INSERT";
+		rq.fromTree = editorModel.fragmentPrototypeFileName;
+		rq.fromNode = inputNode;
+		rq.targetTree = $('#xslFileName').val();
+		rq.targetNode = templateNode;
+		editorServices.insert(rq, bindAndRedrawTree(templateTree)); // a-sync
+	} 
+	
 });
 
 

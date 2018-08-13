@@ -32,7 +32,7 @@ import org.w3c.dom.NodeList;
 
 public class XMLDocumentDecorator {
 
-	File file;
+	private File file;
 	Document doc;
 	Map<Node, Long> nodeMap = new HashMap<Node, Long>();
 	ArrayList<Node> nodes = new ArrayList<Node>();
@@ -46,7 +46,7 @@ public class XMLDocumentDecorator {
 
 	public XMLDocumentDecorator(File file) throws Exception {
 		this(new FileInputStream(file));
-		this.file = file;
+		this.setFile(file);
 	}
 	
 	public XMLDocumentDecorator(InputStream is) throws Exception {
@@ -77,12 +77,12 @@ public class XMLDocumentDecorator {
 	
 	public void save() {
 		try {
-			if (this.file != null) {
-				logger.debug("saving: " + file.getAbsolutePath());
+			if (this.getFile() != null) {
+				logger.debug("saving: " + getFile().getAbsolutePath());
 				Transformer transformer = TransformerFactory.newInstance().newTransformer();
 				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 				transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-				StreamResult result = new StreamResult(file);
+				StreamResult result = new StreamResult(getFile());
 				DOMSource source = new DOMSource(doc);
 				transformer.transform(source, result);
 			}
@@ -192,6 +192,14 @@ public class XMLDocumentDecorator {
 
 	public Document getDocument() {
 		return this.doc;
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
 	}
 	
 }

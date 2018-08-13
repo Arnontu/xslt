@@ -10,6 +10,8 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.QueryResultsRow;
 import org.kie.internal.logger.KnowledgeRuntimeLoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
@@ -23,7 +25,8 @@ public abstract class AbstractRuleRunner<T> {
     @Autowired protected KieContainer container;
     protected KieBase kbase;
     protected KieSession session;
-    KieRuntimeLogger logger;
+    KieRuntimeLogger kieLogger;
+    private static Logger logger = LoggerFactory.getLogger("butters.rules2.RuleRunner"); 
     
 	public T withKnowledgeBase(String kbaseName)  {
 		KieBase kbase = container.getKieBase(kbaseName);
@@ -46,12 +49,12 @@ public abstract class AbstractRuleRunner<T> {
 			//ksession.setGlobal( "list", new ArrayList<Object>() );
 		    session.addEventListener( new DebugAgendaEventListener() );
 		    session.addEventListener( new DebugRuleRuntimeEventListener() );
-		    logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(session);
+		    kieLogger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(session);
 		    
 		    Globals globals = session.getGlobals();
 		    System.out.println( "Globals: " + globals.getGlobalKeys() );
 		} else {
-			if (logger!=null) logger.close();
+			if (kieLogger!=null) kieLogger.close();
 		}
 		
 		return (T) this;
@@ -71,17 +74,18 @@ public abstract class AbstractRuleRunner<T> {
 	}
 
 	public boolean failed() {
-		QueryResults errors = session.getQueryResults("errors");
-		for ( QueryResultsRow err : errors ) {
-			    System.out.println( err.get( "error" ) );
-		}
-
+		int errors = 0;
 		QueryResults results = session.getQueryResults("result");
-		for ( QueryResultsRow row : results ) {
-			    System.out.println( row.get( "result" ) );
+		if (results.size() == 0) { // nothing done
+			logger.error("rule ran successfully but with no actions");
+			errors++;
+		} else for ( QueryResultsRow row : results ) {
+		    ResultBean bean = (ResultBean) row.get( "result" );
+		    if ("error".equalsIgnoreCase(bean.level )) errors++;
+		    logger.debug("rule run result: " + bean );
 		}
 		
-		return (errors.size() > 0);
+		return (errors > 0);
 	}
 	
 	public T withGlobal(String key, Object value) {
@@ -99,7 +103,7 @@ public abstract class AbstractRuleRunner<T> {
 	}
 	
 	public void dispose() {
-		if (logger!=null) logger.close();
+		if (kieLogger!=null) kieLogger.close();
 		session.dispose();
 	}
 } 

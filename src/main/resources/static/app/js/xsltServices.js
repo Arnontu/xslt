@@ -9,6 +9,7 @@ function xsltServices()  {
 			save: "/save",
 			setvalue: "/api/xslt/setvalue",
 			map: "/api/xslt/map",
+			insert: "/api/xslt/insert",
 			run: "/api/xslt/run", 
 			load: "/api/xslt/load"
 		},
@@ -55,7 +56,7 @@ function xsltServices()  {
 			    dataType: "json",
 			    
 			    success : function(data, status) {
-			        alert("Status: " + status);
+			        //alert("Status: " + status);
 			        callback(data);   //JSON.parse(data);
 			    },
 
@@ -74,6 +75,11 @@ function xsltServices()  {
 		// map input element as xsl:value-of 
 		map: function(rq, callback) {
 			this.post(this.urls.map, rq, callback);
+		},
+		
+		// insert fragment to template 
+		insert: function(rq, callback) {
+			this.post(this.urls.insert, rq, callback);
 		},
 		
 		// test: apply the XSLT template on sample input 
