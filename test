@@ -1,0 +1,13 @@
+Order1 = {
+	"date":"1.1.2020",
+	"time":"16:20",
+	"product":"chair",
+	quantity" 5
+}
+
+Order2 = {
+	"date":"2.1.2020",
+	"time":"17:20",
+	"product":"table",
+	quantity" 10
+}
